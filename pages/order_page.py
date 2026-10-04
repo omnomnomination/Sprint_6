@@ -3,15 +3,27 @@ from locators.locators_order_page import OrderPageLocators
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
+import allure
 
 class OrderPage(BasePage):
+
+    @allure.step("Кликнуть верхнюю кнопку 'Заказать'")
     def click_top_order_button(self):
         self.click_element(OrderPageLocators.TOP_ORDER_BUTTON)
 
+    @allure.step("Кликнуть нижнюю кнопку 'Заказать'")
     def click_bottom_order_button(self):
         self.scroll_to_element(OrderPageLocators.BOTTOM_ORDER_BUTTON)
         self.click_element(OrderPageLocators.BOTTOM_ORDER_BUTTON)
 
+    @allure.step("Кликнуть кнопку заказа типа {button_type}")
+    def click_order_button(self, button_type):
+        if button_type == "top":
+            self.click_top_order_button()
+        else:
+            self.click_bottom_order_button()
+
+    @allure.step("Заполняем первую форму")
     def fill_first_form(self, first_name, last_name, address, metro_station, phone):
         WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located(OrderPageLocators.FIRST_NAME_INPUT)).send_keys(first_name)
         self.driver.find_element(*OrderPageLocators.LAST_NAME_INPUT).send_keys(last_name)
@@ -25,6 +37,7 @@ class OrderPage(BasePage):
         self.driver.find_element(*OrderPageLocators.PHONE_INPUT).send_keys(phone)
         self.click_element(OrderPageLocators.NEXT_BUTTON)
 
+    @allure.step("Заполняем вторую форму")
     def fill_second_form(self, date, duration, color_id, comment):
         date_field = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located(OrderPageLocators.DATE_INPUT))
         date_field.send_keys(date)
@@ -43,19 +56,22 @@ class OrderPage(BasePage):
         self.click_element(OrderPageLocators.FINAL_ORDER_BUTTON)
         self.click_element(OrderPageLocators.CONFIRM_YES_BUTTON)
 
-
+    @allure.step("Получаем подтверждение, что заказ сформирован")
     def is_order_successful(self):
         element = WebDriverWait(self.driver, 10).until(
             EC.visibility_of_element_located(OrderPageLocators.SUCCESS_ORDER_HEADER)
         )
         return element.is_displayed()
 
+    @allure.step("Нажимаем на логотип сервиса Самокат")
     def click_scooter_logo(self):
         self.click_element(OrderPageLocators.SCOOTER_LOGO)
 
+    @allure.step("Нажимаем на логотип сервиса Яндекс")
     def click_yandex_logo(self):
         self.click_element(OrderPageLocators.YANDEX_LOGO)
 
+    @allure.step("Получаем подтверждение, что совершен переход на нужную страницу")
     def switch_to_new_window_and_get_url(self):
         WebDriverWait(self.driver, 10).until(lambda d: len(d.window_handles) > 1)
         self.driver.switch_to.window(self.driver.window_handles[1])
