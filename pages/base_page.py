@@ -35,3 +35,20 @@ class BasePage:
     def get_current_url(self):
         return self.driver.current_url
 
+    @allure.step("Ожидание элемента и ввод текста")
+    def send_keys_to_element(self, locator, text, time=10):
+        element = WebDriverWait(self.driver, time).until(
+            EC.visibility_of_element_located(locator)
+        )
+        element.clear()
+        element.send_keys(text)
+
+    @allure.step("Переключиться на новую вкладку и получить её URL")
+    def get_new_window_url(self, expected_url_part):
+        WebDriverWait(self.driver, 10).until(lambda d: len(d.window_handles) > 1)
+        self.driver.switch_to.window(self.driver.window_handles[-1])
+        WebDriverWait(self.driver, 10).until(lambda d: expected_url_part in d.current_url)
+        return self.driver.current_url
+
+
+
